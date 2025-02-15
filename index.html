@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan Sejarah Peminatan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .question h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        .options label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            padding: 5px 0;
+        }
+        .feedback {
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .correct {
+            color: #27ae60;
+            background-color: #e8f6ef;
+        }
+        .incorrect {
+            color: #e74c3c;
+            background-color: #fdedec;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sejarah Peminatan</h1>
+        <div id="quizContainer"></div>
+        <button id="submitButton" onclick="checkAnswers()">lihat Jawaban</button>
+        <button id="nextButton" onclick="loadNextSet()" style="display: none;">Lanjut</button>
+    </div>
+
+    <script src="soal.js"></script>
+    <script>
+        let currentSet = 0;
+        const questionsPerSet = 5;
+        let userAnswers = [];
+
+        function displayQuestions(startIndex, endIndex) {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.innerHTML = '';
+
+            for (let i = startIndex; i < endIndex; i++) {
+                if (i >= questions.length) break;
+
+                const q = questions[i];
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+
+                const questionText = document.createElement('h3');
+                questionText.textContent = q.question;
+                questionDiv.appendChild(questionText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options');
+
+                q.options.forEach(option => {
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question${i}`;
+                    input.value = option.value;
+                    input.onclick = () => userAnswers[i] = option.value;
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${option.label}`));
+                    optionsDiv.appendChild(label);
+                });
+
+                questionDiv.appendChild(optionsDiv);
+                quizContainer.appendChild(questionDiv);
+            }
+        }
+
+        function checkAnswers() {
+            const startIndex = currentSet * questionsPerSet;
+            const endIndex = startIndex + questionsPerSet;
+
+            for (let i = startIndex; i < endIndex; i++) {
+                if (i >= questions.length) break;
+
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.classList.add('feedback');
+
+                if (selectedOption) {
+                    feedbackDiv.textContent = selectedOption.value === questions[i].answer ? 
+                        "Jawaban benar!" : `Jawaban salah! Benar: ${questions[i].answer.toUpperCase()}`;
+                    feedbackDiv.classList.add(selectedOption.value === questions[i].answer ? 'correct' : 'incorrect');
+                } else {
+                    feedbackDiv.textContent = "Anda belum memilih jawaban.";
+                    feedbackDiv.classList.add('incorrect');
+                }
+
+                document.querySelectorAll('.question')[i - startIndex].appendChild(feedbackDiv);
+            }
+
+            document.getElementById('submitButton').style.display = 'none';
+            document.getElementById('nextButton').style.display = 'block';
+        }
+
+        function loadNextSet() {
+            currentSet++;
+            const startIndex = currentSet * questionsPerSet;
+            const endIndex = startIndex + questionsPerSet;
+
+            if (startIndex >= questions.length) {
+                alert("Selamat! Semua soal selesai.");
+                return;
+            }
+
+            displayQuestions(startIndex, endIndex);
+            document.getElementById('submitButton').style.display = 'block';
+            document.getElementById('nextButton').style.display = 'none';
+        }
+
+        displayQuestions(0, questionsPerSet);
+    </script>
+</body>
+</html>
